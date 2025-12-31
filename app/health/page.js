@@ -1,6 +1,20 @@
+"use client";
+import { useState } from 'react';
+import { useApp } from '@/context/AppContext';
 import styles from './page.module.css';
 
 export default function HealthPage() {
+    const [showAI, setShowAI] = useState(true);
+    const { healthStats } = useApp();
+
+    const schedulePT = () => {
+        alert("PT Scheduling: Request sent to Dr. Smith's office for next available slot.");
+    };
+
+    const dismissAI = () => {
+        setShowAI(false);
+    };
+
     return (
         <div className={styles.container}>
             <header className={styles.header}>
@@ -9,8 +23,8 @@ export default function HealthPage() {
                     <p className={styles.subtitle}>Real-time vitals and AI-powered insights.</p>
                 </div>
                 <div className={styles.statusBadge}>
-                    <span className={styles.onlineDot}></span>
-                    Device Online
+                    <span className={styles.onlineDot} style={{ background: healthStats.deviceOnline ? '#10b981' : 'gray', boxShadow: healthStats.deviceOnline ? '0 0 8px #10b981' : 'none' }}></span>
+                    {healthStats.deviceOnline ? 'Device Online' : 'Offline'}
                 </div>
             </header>
 
@@ -22,11 +36,10 @@ export default function HealthPage() {
                     </div>
                     <div className={styles.vitalInfo}>
                         <h3>Heart Rate</h3>
-                        <div className={styles.vitalValue}>72 <span className={styles.unit}>bpm</span></div>
+                        <div className={styles.vitalValue}>{healthStats.heartRate} <span className={styles.unit}>bpm</span></div>
                         <p className={styles.trend}>Avg: 68-74 bpm</p>
                     </div>
                     <div className={styles.chartPlaceholder}>
-                        {/* Simple CSS Chart */}
                         <div className={styles.bar} style={{ height: '40%' }}></div>
                         <div className={styles.bar} style={{ height: '60%' }}></div>
                         <div className={styles.bar} style={{ height: '55%' }}></div>
@@ -43,7 +56,7 @@ export default function HealthPage() {
                     </div>
                     <div className={styles.vitalInfo}>
                         <h3>Sleep Quality</h3>
-                        <div className={styles.vitalValue}>7h 20m</div>
+                        <div className={styles.vitalValue}>{healthStats.sleep}</div>
                         <p className={styles.trend}>Deep Sleep: 1h 45m</p>
                     </div>
                     <div className={styles.chartPlaceholder}>
@@ -63,7 +76,7 @@ export default function HealthPage() {
                     </div>
                     <div className={styles.vitalInfo}>
                         <h3>Activity</h3>
-                        <div className={styles.vitalValue}>3,450</div>
+                        <div className={styles.vitalValue}>{healthStats.steps.toLocaleString()}</div>
                         <p className={styles.trend}>Steps Today</p>
                     </div>
                     <div className={styles.chartPlaceholder}>
@@ -79,21 +92,25 @@ export default function HealthPage() {
             </div>
 
             {/* AI Insights */}
-            <h2 className={styles.sectionTitle}>AI Insights</h2>
-            <div className={`glass ${styles.aiCard}`}>
-                <div className={styles.aiHeader}>
-                    <div className={styles.aiIcon}>✨</div>
-                    <h3>GrampsIQ Analysis</h3>
-                </div>
-                <p className={styles.aiText}>
-                    Based on recent activity patterns, Dad's mobility has decreased by <strong>15%</strong> this week.
-                    This correlates with the reported "Tired" mood on Tuesday. Suggest scheduling a light PT session or a short walk.
-                </p>
-                <div className={styles.aiActions}>
-                    <button className="btn btn-primary">Schedule PT</button>
-                    <button className="btn glass">Dismiss</button>
-                </div>
-            </div>
+            {showAI && (
+                <>
+                    <h2 className={styles.sectionTitle}>AI Insights</h2>
+                    <div className={`glass ${styles.aiCard}`}>
+                        <div className={styles.aiHeader}>
+                            <div className={styles.aiIcon}>✨</div>
+                            <h3>GrampsIQ Analysis</h3>
+                        </div>
+                        <p className={styles.aiText}>
+                            Based on recent activity patterns, Dad's mobility has decreased by <strong>15%</strong> this week.
+                            This correlates with the reported "Tired" mood on Tuesday. Suggest scheduling a light PT session or a short walk.
+                        </p>
+                        <div className={styles.aiActions}>
+                            <button className="btn btn-primary" onClick={schedulePT}>Schedule PT</button>
+                            <button className="btn glass" onClick={dismissAI}>Dismiss</button>
+                        </div>
+                    </div>
+                </>
+            )}
         </div>
     );
 }
