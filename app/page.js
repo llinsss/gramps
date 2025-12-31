@@ -1,66 +1,80 @@
-import Image from "next/image";
-import styles from "./page.module.css";
+import styles from './page.module.css';
 
 export default function Home() {
   return (
-    <div className={styles.page}>
-      <main className={styles.main}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className={styles.intro}>
-          <h1>To get started, edit the page.js file.</h1>
-          <p>
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+    <div className={styles.container}>
+      <header className={styles.header}>
+        <h1 className="gradient-text">Good Morning, Jane</h1>
+        <p className={styles.subtitle}>Here's what's happening with Mom & Dad today.</p>
+      </header>
+
+      <div className={styles.grid}>
+        {/* Calendar Widget */}
+        <div className={`card ${styles.widget} ${styles.calendarWidget}`}>
+          <div className={styles.widgetHeader}>
+            <h3>Upcoming Events</h3>
+            <span className={styles.badge}>Today</span>
+          </div>
+          <div className={styles.eventItem}>
+            <div className={styles.eventTime}>2:00 PM</div>
+            <div className={styles.eventDetails}>
+              <h4>Cardiologist Appointment</h4>
+              <p>Dr. Smith • Main Street Clinic</p>
+            </div>
+          </div>
+          <div className={styles.eventItem}>
+            <div className={styles.eventTime}>5:00 PM</div>
+            <div className={styles.eventDetails}>
+              <h4>Family Dinner</h4>
+              <p>Mom's House</p>
+            </div>
+          </div>
         </div>
-        <div className={styles.ctas}>
-          <a
-            className={styles.primary}
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className={styles.logo}
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className={styles.secondary}
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+
+        {/* Tasks Widget */}
+        <div className={`card ${styles.widget} ${styles.tasksWidget}`}>
+          <div className={styles.widgetHeader}>
+            <h3>Pending Tasks</h3>
+            <span className={styles.badgeWarning}>3 Urgent</span>
+          </div>
+          <ul className={styles.taskList}>
+            <li className={styles.taskItem}>
+              <button className={styles.checkbox}></button>
+              <span>Pay Electricity Bill</span>
+            </li>
+            <li className={styles.taskItem}>
+              <button className={styles.checkbox}></button>
+              <span>Refill Prescriptions</span>
+            </li>
+            <li className={styles.taskItem}>
+              <button className={styles.checkbox}></button>
+              <span>Call Insurance</span>
+            </li>
+          </ul>
         </div>
-      </main>
+
+        {/* Health Widget */}
+        <div className={`card ${styles.widget} ${styles.healthWidget}`}>
+          <div className={styles.widgetHeader}>
+            <h3>Health Status</h3>
+            <span className={styles.badgeSuccess}>Stable</span>
+          </div>
+          <div className={styles.vitalsGrid}>
+            <div className={styles.vital}>
+              <span className={styles.vitalLabel}>Heart Rate</span>
+              <span className={styles.vitalValue}>72 <small>bpm</small></span>
+            </div>
+            <div className={styles.vital}>
+              <span className={styles.vitalLabel}>Blood Pressure</span>
+              <span className={styles.vitalValue}>120/80</span>
+            </div>
+            <div className={styles.vital}>
+              <span className={styles.vitalLabel}>Sleep</span>
+              <span className={styles.vitalValue}>7h 20m</span>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
