@@ -1,21 +1,15 @@
 "use client";
 import { useState } from 'react';
+import { useApp } from '@/context/AppContext';
 import styles from './page.module.css';
 
 export default function CalendarPage() {
     const [currentDate, setCurrentDate] = useState(new Date());
-
-    // Mock events
-    const events = [
-        { id: 1, title: 'Cardiologist', date: 15, type: 'medical', time: '2:00 PM' },
-        { id: 2, title: 'Family Dinner', date: 15, type: 'social', time: '6:00 PM' },
-        { id: 3, title: 'Grocery Run', date: 18, type: 'task', time: '10:00 AM' },
-        { id: 4, title: 'PT Session', date: 22, type: 'medical', time: '11:00 AM' },
-    ];
+    const { events, addEvent: addEventContext } = useApp();
 
     // Calendar Logic (Simplified for demo)
-    const daysInMonth = 31; // assuming current month has 31 days
-    const startDay = 3; // Wednesday (0=Sun, 1=Mon, 2=Tue, 3=Wed)
+    const daysInMonth = 31;
+    const startDay = 3; // Wednesday
 
     const days = [];
     for (let i = 0; i < startDay; i++) {
@@ -27,6 +21,24 @@ export default function CalendarPage() {
 
     const getEventsForDay = (day) => events.filter(e => e.date === day);
 
+    const addEvent = () => {
+        const title = window.prompt("Event Title:");
+        if (!title) return;
+        const date = parseInt(window.prompt("Day of month (1-31):") || "1");
+        const type = window.prompt("Type (medical, social, task):") || "social";
+        const time = window.prompt("Time:") || "12:00 PM";
+
+        const newEvent = {
+            id: Date.now(),
+            title,
+            date,
+            type,
+            time
+        };
+
+        addEventContext(newEvent);
+    };
+
     return (
         <div className={styles.container}>
             <header className={styles.header}>
@@ -34,7 +46,7 @@ export default function CalendarPage() {
                     <h1 className="gradient-text">Shared Calendar</h1>
                     <p className={styles.subtitle}>Coordinate appointments and family events.</p>
                 </div>
-                <button className="btn btn-primary">
+                <button className="btn btn-primary" onClick={addEvent}>
                     + Add Event
                 </button>
             </header>
@@ -71,7 +83,7 @@ export default function CalendarPage() {
                     <div className={`card ${styles.upcomingCard}`}>
                         <h3>Upcoming</h3>
                         <div className={styles.eventList}>
-                            {events.map(ev => (
+                            {events.sort((a, b) => a.date - b.date).map(ev => (
                                 <div key={ev.id} className={styles.eventItem}>
                                     <div className={styles.eventDate}>
                                         <span className={styles.dateNum}>{ev.date}</span>
