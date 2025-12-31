@@ -1,13 +1,13 @@
 :root {
-  --bg-primary: #0f172a;
-  --bg-secondary: #1e293b;
+  --bg-primary: #000000;
+  --bg-secondary: #0a0a0a;
   --text-primary: #f8fafc;
   --text-secondary: #94a3b8;
   --accent-primary: #38bdf8;
   --accent-secondary: #818cf8;
-  --glass-bg: rgba(30, 41, 59, 0.6);
-  --glass-border: rgba(255, 255, 255, 0.08);
-  --card-bg: rgba(255, 255, 255, 0.03);
+  --glass-bg: rgba(10, 10, 10, 0.8);
+  --glass-border: rgba(255, 255, 255, 0.06);
+  --card-bg: rgba(20, 20, 20, 0.4);
   --success: #10b981;
   --warning: #f59e0b;
   --danger: #ef4444;
@@ -25,9 +25,9 @@ body {
   color: var(--text-primary);
   font-family: var(--font-main);
   overflow-x: hidden;
-  background-image: 
-    radial-gradient(circle at 10% 20%, rgba(56, 189, 248, 0.1) 0%, transparent 40%),
-    radial-gradient(circle at 90% 80%, rgba(129, 140, 248, 0.1) 0%, transparent 40%);
+  background-image:
+    radial-gradient(circle at 10% 20%, rgba(56, 189, 248, 0.06) 0%, transparent 40%),
+    radial-gradient(circle at 90% 80%, rgba(129, 140, 248, 0.06) 0%, transparent 40%);
   min-height: 100vh;
 }
 
@@ -61,6 +61,7 @@ a {
 
 .gradient-text {
   background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+  background-clip: text;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   font-weight: 700;
