@@ -1,0 +1,150 @@
+.container {
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 40px;
+}
+
+.header h1 {
+    font-size: 2.5rem;
+    margin-bottom: 8px;
+}
+
+.subtitle {
+    color: var(--text-secondary);
+}
+
+.actions {
+    display: flex;
+    gap: 12px;
+}
+
+.section {
+    margin-bottom: 40px;
+}
+
+.sectionTitle {
+    font-size: 1rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 16px;
+    font-weight: 700;
+    opacity: 0.9;
+}
+
+.taskList {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.taskRow {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 16px 20px;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.03);
+    transition: all 0.2s;
+    cursor: pointer;
+}
+
+.taskRow:hover {
+    background: rgba(255, 255, 255, 0.06);
+    transform: translateX(4px);
+}
+
+.overdue {
+    border-left: 3px solid var(--danger);
+}
+
+.urgent {
+    border-left: 3px solid var(--warning);
+}
+
+.pending {
+    border-left: 3px solid transparent;
+}
+
+.checkbox {
+    width: 24px;
+    height: 24px;
+    border: 2px solid var(--text-secondary);
+    border-radius: 8px;
+    background: transparent;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--bg-primary);
+    font-size: 14px;
+    font-weight: 900;
+}
+
+.checkbox:hover {
+    border-color: var(--accent-primary);
+    background: rgba(56, 189, 248, 0.1);
+}
+
+.checked {
+    background: var(--success) !important;
+    border-color: var(--success);
+}
+
+.strike {
+    text-decoration: line-through;
+    color: var(--text-secondary);
+}
+
+.completed {
+    border-left: 3px solid var(--success);
+    opacity: 0.6;
+}
+
+.checkbox:hover {
+    border-color: var(--accent-primary);
+    background: rgba(56, 189, 248, 0.1);
+}
+
+.taskInfo {
+    flex: 1;
+}
+
+.taskTitle {
+    display: block;
+    font-size: 1.05rem;
+    font-weight: 500;
+    color: var(--text-primary);
+    margin-bottom: 2px;
+}
+
+.taskMeta {
+    display: block;
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+}
+
+.overdue .taskMeta {
+    color: var(--danger);
+    font-weight: 600;
+}
+
+.assignee {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: var(--bg-secondary);
+    color: var(--text-secondary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.8rem;
+    font-weight: 700;
+    border: 1px solid var(--glass-border);
+}

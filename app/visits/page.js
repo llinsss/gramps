@@ -1,11 +1,31 @@
+"use client";
+import { useApp } from '@/context/AppContext';
 import styles from './page.module.css';
 
 export default function VisitsPage() {
-    const visits = [
-        { id: 1, date: 'Today, 10:30 AM', visitor: 'Jane (You)', mood: 'Happy', moodColor: 'var(--success)', note: 'Brought groceries. Dad was in good spirits, watched the game together.' },
-        { id: 2, date: 'Yesterday, 5:00 PM', visitor: 'Mark (Brother)', mood: 'Tired', moodColor: 'var(--warning)', note: 'Stopped by after work. He seemed a bit lethargic, check BP tomorrow.' },
-        { id: 3, date: 'Oct 28, 2:00 PM', visitor: 'Dr. Smith', mood: 'Neutral', moodColor: 'var(--accent-primary)', note: 'Routine checkup. Everything looks stable.' },
-    ];
+    const { visits, addVisit: addVisitContext } = useApp();
+
+    const addCheckIn = () => {
+        const visitor = window.prompt("Who is visiting?") || "Me";
+        const note = window.prompt("How was the visit? (Notes)") || "Routine check-in";
+        const moodInput = window.prompt("Mood? (Happy, Tired, Neutral)") || "Neutral";
+
+        let moodColor = 'var(--text-secondary)';
+        if (moodInput.toLowerCase().includes('happy')) moodColor = 'var(--success)';
+        if (moodInput.toLowerCase().includes('tired')) moodColor = 'var(--warning)';
+        if (moodInput.toLowerCase().includes('neutral')) moodColor = 'var(--accent-primary)';
+
+        const newVisit = {
+            id: Date.now(),
+            date: 'Just Now',
+            visitor,
+            mood: moodInput,
+            moodColor,
+            note
+        };
+
+        addVisitContext(newVisit);
+    };
 
     return (
         <div className={styles.container}>
@@ -14,7 +34,7 @@ export default function VisitsPage() {
                     <h1 className="gradient-text">Visit Log</h1>
                     <p className={styles.subtitle}>Track check-ins, mood, and daily observations.</p>
                 </div>
-                <button className="btn btn-primary">
+                <button className="btn btn-primary" onClick={addCheckIn}>
                     + New Check-in
                 </button>
             </header>
