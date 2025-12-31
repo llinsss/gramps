@@ -1,3 +1,5 @@
+"use client";
+import { useState } from 'react';
 import styles from './page.module.css';
 
 export default function DocumentsPage() {
@@ -8,11 +10,29 @@ export default function DocumentsPage() {
         { name: 'IDs', count: 3, icon: '🪪', color: 'var(--accent-secondary)' },
     ];
 
-    const recentDocs = [
+    const [docs, setDocs] = useState([
         { title: 'Medicare Card.pdf', category: 'IDs', date: 'Oct 24, 2024', size: '1.2 MB' },
         { title: 'DNR Order.pdf', category: 'Legal', date: 'Sep 12, 2024', size: '2.4 MB' },
         { title: 'Prescription List.jpg', category: 'Medical', date: 'Dec 01, 2024', size: '800 KB' },
-    ];
+    ]);
+
+    const uploadDoc = () => {
+        const title = window.prompt("Document Filename:") || "New Document.pdf";
+        const category = window.prompt("Category (Medical, Legal, IDs):") || "General";
+
+        const newDoc = {
+            title,
+            category,
+            date: 'Just Now',
+            size: '100 KB'
+        };
+
+        setDocs([newDoc, ...docs]);
+    };
+
+    const handleAction = (title) => {
+        alert(`Downloading ${title}... (Secure encrypted download)`);
+    };
 
     return (
         <div className={styles.container}>
@@ -21,7 +41,7 @@ export default function DocumentsPage() {
                     <h1 className="gradient-text">The Vault</h1>
                     <p className={styles.subtitle}>Secure storage for critical family documents.</p>
                 </div>
-                <button className="btn btn-primary">
+                <button className="btn btn-primary" onClick={uploadDoc}>
                     + Upload Document
                 </button>
             </header>
@@ -44,14 +64,14 @@ export default function DocumentsPage() {
             {/* Recent Files */}
             <h2 className={styles.sectionTitle}>Recent Files</h2>
             <div className={styles.docList}>
-                {recentDocs.map((doc, index) => (
+                {docs.map((doc, index) => (
                     <div key={index} className={`glass ${styles.docRow}`}>
                         <div className={styles.docIcon}>📄</div>
                         <div className={styles.docDetails}>
                             <h4>{doc.title}</h4>
                             <p>{doc.category} • {doc.date} • {doc.size}</p>
                         </div>
-                        <button className={styles.actionBtn}>⋮</button>
+                        <button className={styles.actionBtn} onClick={() => handleAction(doc.title)}>⋮</button>
                     </div>
                 ))}
             </div>
