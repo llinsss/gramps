@@ -2,10 +2,18 @@
 import { useState } from 'react';
 import { useApp } from '@/context/AppContext';
 import styles from './page.module.css';
+import Modal from '@/components/Modal';
 
 export default function CalendarPage() {
     const [currentDate, setCurrentDate] = useState(new Date());
-    const { events, addEvent: addEventContext } = useApp();
+    const { events, addEvent } = useApp();
+    const [isModalOpen, setIsModalOpen] = useState(false);
+
+    // Form State
+    const [eventTitle, setEventTitle] = useState('');
+    const [eventDate, setEventDate] = useState('15');
+    const [eventType, setEventType] = useState('social');
+    const [eventTime, setEventTime] = useState('12:00 PM');
 
     // Calendar Logic (Simplified for demo)
     const daysInMonth = 31;
@@ -21,22 +29,22 @@ export default function CalendarPage() {
 
     const getEventsForDay = (day) => events.filter(e => e.date === day);
 
-    const addEvent = () => {
-        const title = window.prompt("Event Title:");
-        if (!title) return;
-        const date = parseInt(window.prompt("Day of month (1-31):") || "1");
-        const type = window.prompt("Type (medical, social, task):") || "social";
-        const time = window.prompt("Time:") || "12:00 PM";
+    const handleAddEvent = (e) => {
+        e.preventDefault();
+        if (!eventTitle) return;
 
         const newEvent = {
             id: Date.now(),
-            title,
-            date,
-            type,
-            time
+            title: eventTitle,
+            date: parseInt(eventDate),
+            type: eventType,
+            time: eventTime
         };
 
-        addEventContext(newEvent);
+        addEvent(newEvent);
+        setIsModalOpen(false);
+        setEventTitle('');
+        setEventDate('15');
     };
 
     return (
@@ -46,7 +54,7 @@ export default function CalendarPage() {
                     <h1 className="gradient-text">Shared Calendar</h1>
                     <p className={styles.subtitle}>Coordinate appointments and family events.</p>
                 </div>
-                <button className="btn btn-primary" onClick={addEvent}>
+                <button className="btn btn-primary" onClick={() => setIsModalOpen(true)}>
                     + Add Event
                 </button>
             </header>
@@ -99,6 +107,60 @@ export default function CalendarPage() {
                     </div>
                 </div>
             </div>
+
+            <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title="Add Event">
+                <form onSubmit={handleAddEvent} className="modal-form">
+                    <div className="form-group">
+                        <label>Event Title</label>
+                        <input
+                            type="text"
+                            placeholder="e.g., Cardiologist Apt"
+                            value={eventTitle}
+                            onChange={(e) => setEventTitle(e.target.value)}
+                            className="input-glass"
+                            autoFocus
+                        />
+                    </div>
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+                        <div className="form-group">
+                            <label>Date (Oct)</label>
+                            <input
+                                type="number"
+                                min="1" max="31"
+                                value={eventDate}
+                                onChange={(e) => setEventDate(e.target.value)}
+                                className="input-glass"
+                            />
+                        </div>
+                        <div className="form-group">
+                            <label>Time</label>
+                            <input
+                                type="text"
+                                placeholder="2:00 PM"
+                                value={eventTime}
+                                onChange={(e) => setEventTime(e.target.value)}
+                                className="input-glass"
+                            />
+                        </div>
+                    </div>
+                    <div className="form-group">
+                        <label>Type</label>
+                        <select
+                            value={eventType}
+                            onChange={(e) => setEventType(e.target.value)}
+                            className="input-glass"
+                        >
+                            <option value="social">Social</option>
+                            <option value="medical">Medical</option>
+                            <option value="task">Task</option>
+                        </select>
+                    </div>
+                    <div className="form-actions">
+                        <button type="button" className="btn glass" onClick={() => setIsModalOpen(false)}>Cancel</button>
+                        <button type="submit" className="btn btn-primary">Add Event</button>
+                    </div>
+                </form>
+            </Modal>
         </div>
     );
 }
