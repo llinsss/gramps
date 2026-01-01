@@ -1,5 +1,6 @@
 import './globals.css';
 import Sidebar from '@/components/Sidebar';
+import BottomNav from '@/components/BottomNav';
 import { AppProvider } from '@/context/AppContext';
 
 export const metadata = {
@@ -17,6 +18,7 @@ export default function RootLayout({ children }) {
             <main className="main-content">
               {children}
             </main>
+            <BottomNav />
           </div>
         </AppProvider>
       </body>
