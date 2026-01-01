@@ -104,6 +104,32 @@ a {
   flex: 1;
   padding: 32px;
   overflow-y: auto;
+  padding-bottom: 100px;
+  /* Space for scroll on bottom */
+}
+
+/* Base Sidebar Style (Desktop) */
+aside {
+  display: block;
+}
+
+/* Responsiveness */
+@media (max-width: 768px) {
+  .layout-container {
+    flex-direction: column;
+  }
+
+  aside {
+    display: none;
+    /* Hide Sidebar on Mobile */
+  }
+
+  .main-content {
+    padding: 16px;
+    padding-bottom: 120px;
+    /* Extra space for BottomNav + Safe Area */
+    width: 100%;
+  }
 }
 
 /* Input Styles for Modals */
