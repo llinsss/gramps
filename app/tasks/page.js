@@ -1,9 +1,16 @@
 "use client";
+import { useState } from 'react';
 import { useApp } from '@/context/AppContext';
 import styles from './page.module.css';
+import Modal from '@/components/Modal';
 
 export default function TasksPage() {
     const { tasks, addTask, toggleTask } = useApp();
+    const [isModalOpen, setIsModalOpen] = useState(false);
+
+    // Form State
+    const [newTaskTitle, setNewTaskTitle] = useState('');
+    const [newTaskAssignee, setNewTaskAssignee] = useState('Jane');
 
     const sections = [
         { title: 'Overdue & High Priority', color: 'var(--danger)' },
@@ -11,20 +18,21 @@ export default function TasksPage() {
         { title: 'Maintenance & Admin', color: 'var(--text-secondary)' },
     ];
 
-    const addNewTask = () => {
-        const title = window.prompt("Enter task title:");
-        if (!title) return;
-        const assignee = window.prompt("Who is doing this? (Jane, Mark, Dad)") || "Unassigned";
+    const handleAddTask = (e) => {
+        e.preventDefault();
+        if (!newTaskTitle) return;
 
         const newTask = {
             id: Date.now(),
-            title,
-            assignee,
+            title: newTaskTitle,
+            assignee: newTaskAssignee,
             due: 'Upcoming',
             status: 'pending',
             section: 'Current Week'
         };
         addTask(newTask);
+        setIsModalOpen(false);
+        setNewTaskTitle('');
     };
 
     const splitExpense = () => {
@@ -40,7 +48,7 @@ export default function TasksPage() {
                 </div>
                 <div className={styles.actions}>
                     <button className="btn glass" onClick={splitExpense}>Split Expense</button>
-                    <button className="btn btn-primary" onClick={addNewTask}>+ New Task</button>
+                    <button className="btn btn-primary" onClick={() => setIsModalOpen(true)}>+ New Task</button>
                 </div>
             </header>
 
@@ -81,6 +89,39 @@ export default function TasksPage() {
                     );
                 })}
             </div>
+
+            <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title="Add New Task">
+                <form onSubmit={handleAddTask} className="modal-form">
+                    <div className="form-group">
+                        <label>Task Title</label>
+                        <input
+                            type="text"
+                            placeholder="e.g., Pay Water Bill"
+                            value={newTaskTitle}
+                            onChange={(e) => setNewTaskTitle(e.target.value)}
+                            className="input-glass"
+                            autoFocus
+                        />
+                    </div>
+                    <div className="form-group">
+                        <label>Assignee</label>
+                        <select
+                            value={newTaskAssignee}
+                            onChange={(e) => setNewTaskAssignee(e.target.value)}
+                            className="input-glass"
+                        >
+                            <option value="Jane">Jane</option>
+                            <option value="Mark">Mark</option>
+                            <option value="Dad">Dad</option>
+                            <option value="Unassigned">Unassigned</option>
+                        </select>
+                    </div>
+                    <div className="form-actions">
+                        <button type="button" className="btn glass" onClick={() => setIsModalOpen(false)}>Cancel</button>
+                        <button type="submit" className="btn btn-primary">Create Task</button>
+                    </div>
+                </form>
+            </Modal>
         </div>
     );
 }
