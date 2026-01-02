@@ -1,0 +1,142 @@
+.container {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    height: 100%;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.badge {
+    background: rgba(0, 82, 255, 0.2);
+    /* Base Blue */
+    color: #0052ff;
+    font-size: 0.75rem;
+    font-weight: 700;
+    padding: 4px 8px;
+    border-radius: 6px;
+    border: 1px solid rgba(0, 82, 255, 0.3);
+}
+
+.connectState {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    flex: 1;
+    text-align: center;
+    gap: 16px;
+    color: var(--text-secondary);
+    padding: 24px 0;
+}
+
+.balanceCard {
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 12px;
+    padding: 16px;
+    border: 1px solid var(--glass-border);
+}
+
+.label {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.balanceRow {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 4px;
+}
+
+.amount {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.copyBtn {
+    background: transparent;
+    border: none;
+    font-size: 1.2rem;
+    cursor: pointer;
+    opacity: 0.7;
+}
+
+.address {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    font-family: monospace;
+    margin-top: 4px;
+}
+
+.transactions {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.transactions h4 {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    font-weight: 600;
+}
+
+.list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.txRow {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 0.9rem;
+}
+
+.txIcon {
+    background: rgba(255, 255, 255, 0.05);
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.txInfo {
+    flex: 1;
+}
+
+.txTitle {
+    font-weight: 500;
+    color: var(--text-primary);
+}
+
+.txMeta {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+}
+
+.txAmount {
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.positive {
+    color: var(--success);
+}
+
+.actionBtn {
+    width: 100%;
+    text-align: center;
+    margin-top: auto;
+}
