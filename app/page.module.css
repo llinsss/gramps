@@ -67,98 +67,129 @@
 }
 
 /* Calendar Widget */
-.eventItem {
+.eventHighlight {
   display: flex;
-  gap: 16px;
-  margin-bottom: 20px;
-  padding-bottom: 20px;
-  border-bottom: 1px solid var(--glass-border);
+  align-items: center;
+  gap: 20px;
+  background: rgba(255, 255, 255, 0.03);
+  padding: 20px;
+  border-radius: 12px;
+  border: 1px solid var(--glass-border);
 }
 
-.eventItem:last-child {
-  border-bottom: none;
-}
-
-.eventTime {
-  font-weight: 600;
+.eventDate {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: rgba(56, 189, 248, 0.1);
+  padding: 12px;
+  border-radius: 12px;
+  min-width: 80px;
   color: var(--accent-primary);
-  min-width: 70px;
 }
 
-.eventDetails h4 {
-  font-size: 1rem;
-  margin-bottom: 4px;
+.bigNum {
+  font-size: 1.8rem;
+  font-weight: 800;
+  line-height: 1;
 }
 
-.eventDetails p {
-  font-size: 0.85rem;
-  color: var(--text-secondary);
+.month {
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 1px;
 }
 
 /* Tasks Widget */
-.taskList {
+.miniList {
   list-style: none;
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 12px;
 }
 
-.taskItem {
+.miniListItem {
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 12px;
-  background: rgba(255, 255, 255, 0.02);
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+}
+
+.dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--accent-secondary);
+  box-shadow: 0 0 10px rgba(129, 140, 248, 0.4);
+}
+
+.alert {
+  margin-top: auto;
+  background: rgba(239, 68, 68, 0.1);
+  color: var(--danger);
+  padding: 10px;
   border-radius: 8px;
-  transition: background 0.2s;
-}
-
-.taskItem:hover {
-  background: rgba(255, 255, 255, 0.05);
-}
-
-.checkbox {
-  width: 20px;
-  height: 20px;
-  border: 2px solid var(--text-secondary);
-  border-radius: 6px;
-  background: transparent;
-  cursor: pointer;
-}
-
-.checkbox:hover {
-  border-color: var(--accent-primary);
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-align: center;
+  border: 1px solid rgba(239, 68, 68, 0.2);
 }
 
 /* Health Widget */
+.liveIndicator {
+  color: var(--success);
+  font-size: 0.8rem;
+  font-weight: 600;
+  animation: pulse 2s infinite;
+}
+
 .vitalsGrid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 16px;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 12px;
+  margin-top: 12px;
 }
 
 .vital {
-  background: rgba(255, 255, 255, 0.02);
-  padding: 16px;
+  background: rgba(255, 255, 255, 0.03);
+  padding: 12px;
   border-radius: 12px;
-  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
 }
 
 .vitalLabel {
-  display: block;
-  font-size: 0.8rem;
+  font-size: 0.75rem;
   color: var(--text-secondary);
-  margin-bottom: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 .vitalValue {
-  font-size: 1.5rem;
+  font-size: 1.2rem;
   font-weight: 700;
   color: var(--text-primary);
 }
 
-.vitalValue small {
-  font-size: 0.8rem;
+.unit {
+  font-size: 0.7rem;
   font-weight: 400;
   color: var(--text-secondary);
+}
+
+@keyframes pulse {
+  0% {
+    opacity: 0.5;
+  }
+
+  50% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 0.5;
+  }
 }

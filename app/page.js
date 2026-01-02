@@ -1,95 +1,104 @@
 "use client";
-import styles from './page.module.css';
 import { useApp } from '@/context/AppContext';
+import { useState } from 'react';
+import Link from 'next/link';
+import CareFundWidget from '@/components/CareFundWidget';
+import styles from './page.module.css';
 
 export default function Home() {
   const { events, tasks, healthStats } = useApp();
 
-  // Get next upcoming event (simplified logic: just taking the first one for now, or sorting)
-  const upcomingEvents = [...events].sort((a, b) => a.date - b.date);
+  // Logic to find next event
+  const today = 15; // Mock Date
+  const pendingTasks = tasks.filter(t => t.status === 'pending');
+  const upcomingEvents = events.filter(e => e.date >= today).sort((a, b) => a.date - b.date);
   const nextEvent = upcomingEvents[0];
-  const followingEvent = upcomingEvents[1];
-
-  // Get urgent tasks
-  const urgentTasks = tasks.filter(t => t.status === 'urgent' || t.status === 'overdue');
-  const pendingTasks = tasks.filter(t => t.status !== 'completed').slice(0, 3); // Top 3 pending
 
   return (
     <div className={styles.container}>
       <header className={styles.header}>
         <h1 className="gradient-text">Good Morning, Jane</h1>
-        <p className={styles.subtitle}>Here's what's happening with Mom & Dad today.</p>
+        <p className={styles.subtitle}>Here is what is happening with Dad today.</p>
       </header>
 
       <div className={styles.grid}>
-        {/* Calendar Widget */}
-        <div className={`card ${styles.widget} ${styles.calendarWidget}`}>
+
+        {/* Widget 1: Up Next */}
+        <Link href="/calendar" className={`card ${styles.widget} ${styles.calendarWidget}`}>
           <div className={styles.widgetHeader}>
-            <h3>Upcoming Events</h3>
-            <span className={styles.badge}>Today</span>
+            <h3>Up Next</h3>
+            <span className={styles.icon}>📅</span>
           </div>
           {nextEvent ? (
-            <>
-              <div className={styles.eventItem}>
-                <div className={styles.eventTime}>{nextEvent.time}</div>
-                <div className={styles.eventDetails}>
-                  <h4>{nextEvent.title}</h4>
-                  <p>{nextEvent.type === 'medical' ? 'Doctor Appointment' : 'Family Event'}</p>
-                </div>
+            <div className={styles.eventHighlight}>
+              <div className={styles.eventDate}>
+                <span className={styles.bigNum}>{nextEvent.date}</span>
+                <span className={styles.month}>OCT</span>
               </div>
-              {followingEvent && (
-                <div className={styles.eventItem}>
-                  <div className={styles.eventTime}>{followingEvent.time}</div>
-                  <div className={styles.eventDetails}>
-                    <h4>{followingEvent.title}</h4>
-                    <p>{followingEvent.type}</p>
-                  </div>
-                </div>
-              )}
-            </>
+              <div className={styles.eventDetails}>
+                <h4>{nextEvent.title}</h4>
+                <p>{nextEvent.time}</p>
+              </div>
+            </div>
           ) : (
-            <p style={{ color: 'var(--text-secondary)' }}>No upcoming events.</p>
+            <p>No upcoming events.</p>
           )}
-        </div>
+        </Link>
 
-        {/* Tasks Widget */}
-        <div className={`card ${styles.widget} ${styles.tasksWidget}`}>
+        {/* Widget 2: Pending Tasks */}
+        <Link href="/tasks" className={`card ${styles.widget}`}>
           <div className={styles.widgetHeader}>
             <h3>Pending Tasks</h3>
-            {urgentTasks.length > 0 && <span className={styles.badgeWarning}>{urgentTasks.length} Urgent</span>}
+            <span className={styles.badge}>{pendingTasks.length}</span>
           </div>
-          <ul className={styles.taskList}>
-            {pendingTasks.map(task => (
-              <li key={task.id} className={styles.taskItem}>
-                <div className={styles.checkbox} style={{ borderColor: task.status === 'completed' ? 'var(--success)' : 'var(--text-secondary)' }}></div>
-                <span>{task.title}</span>
+          <ul className={styles.miniList}>
+            {pendingTasks.slice(0, 3).map(task => (
+              <li key={task.id} className={styles.miniListItem}>
+                <span className={styles.dot}></span>
+                {task.title}
               </li>
             ))}
-            {pendingTasks.length === 0 && <p style={{ color: 'var(--text-secondary)' }}>All caught up!</p>}
           </ul>
+          {pendingTasks.some(t => t.section.includes('Overdue')) && (
+            <div className={styles.alert}>
+              ⚠️ Urgent items!
+            </div>
+          )}
+        </Link>
+
+        {/* Widget 3: Care Fund (Web3) */}
+        <div className={styles.widget}>
+          <CareFundWidget />
         </div>
 
-        {/* Health Widget */}
-        <div className={`card ${styles.widget} ${styles.healthWidget}`}>
+        {/* Widget 4: Health Status */}
+        <Link href="/health" className={`card ${styles.widget} ${styles.healthWidget}`}>
           <div className={styles.widgetHeader}>
-            <h3>Health Status</h3>
-            <span className={styles.badgeSuccess}>Stable</span>
+            <h3>Live Vitals</h3>
+            <span className={styles.liveIndicator}>• Live</span>
           </div>
           <div className={styles.vitalsGrid}>
             <div className={styles.vital}>
-              <span className={styles.vitalLabel}>Heart Rate</span>
-              <span className={styles.vitalValue}>{healthStats.heartRate} <small>bpm</small></span>
+              <span className={styles.vitalLabel}>HR</span>
+              <span className={styles.vitalValue} style={{ color: 'var(--danger)' }}>
+                {healthStats.heartRate} <span className={styles.unit}>bpm</span>
+              </span>
             </div>
             <div className={styles.vital}>
               <span className={styles.vitalLabel}>Sleep</span>
-              <span className={styles.vitalValue}>{healthStats.sleep}</span>
+              <span className={styles.vitalValue} style={{ color: 'var(--accent-secondary)' }}>
+                {healthStats.sleep} <span className={styles.unit}>hrs</span>
+              </span>
             </div>
             <div className={styles.vital}>
               <span className={styles.vitalLabel}>Steps</span>
-              <span className={styles.vitalValue}>{healthStats.steps}</span>
+              <span className={styles.vitalValue}>
+                {healthStats.steps}
+              </span>
             </div>
           </div>
-        </div>
+        </Link>
+
       </div>
     </div>
   );

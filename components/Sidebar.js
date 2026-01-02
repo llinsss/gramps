@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import styles from './Sidebar.module.css';
+import ConnectButton from './ConnectButton';
 
 export default function Sidebar() {
   const menuItems = [
@@ -27,10 +28,15 @@ export default function Sidebar() {
       </nav>
 
       <div className={styles.profile}>
-        <div className={styles.avatar}>JS</div>
-        <div className={styles.userInfo}>
-          <p className={styles.userName}>Jane Smith</p>
-          <p className={styles.userRole}>Family Manager</p>
+        <div style={{ marginBottom: '16px', width: '100%' }}>
+          <ConnectButton />
+        </div>
+        <div className={styles.flexRow}>
+          <div className={styles.avatar}>JS</div>
+          <div className={styles.userInfo}>
+            <p className={styles.userName}>Jane Smith</p>
+            <p className={styles.userRole}>Family Manager</p>
+          </div>
         </div>
       </div>
     </aside>
