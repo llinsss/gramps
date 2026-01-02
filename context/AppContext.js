@@ -47,16 +47,43 @@ export function AppProvider({ children }) {
         deviceOnline: true
     });
 
-    return (
-        <AppContext.Provider value={{
-            tasks, addTask, toggleTask,
-            events, addEvent,
-            visits, addVisit,
-            healthStats, setHealthStats
-        }}>
-            {children}
-        </AppContext.Provider>
-    );
+    // Web3 State (Mock)
+    const [isConnected, setIsConnected] = useState(false);
+    const [walletAddress, setWalletAddress] = useState('');
+    const [careFundBalance, setCareFundBalance] = useState('4.2 ETH'); // Mock balance
+    const [recentTransactions, setRecentTransactions] = useState([
+        { id: 1, type: 'Deposit', from: 'Mark', amount: '0.5 ETH', date: '2h ago' },
+        { id: 2, type: 'Expense', to: 'CVS Pharmacy', amount: '0.05 ETH', date: '1d ago', reason: 'Meds' },
+    ]);
+
+    const connectWallet = () => {
+        // Simulate connection delay
+        setTimeout(() => {
+            setIsConnected(true);
+            setWalletAddress('0x71C...9B21');
+        }, 800);
+    };
+
+    const disconnectWallet = () => {
+        setIsConnected(false);
+        setWalletAddress('');
+    };
+
+    const value = {
+        tasks, addTask, toggleTask,
+        events, addEvent,
+        visits, addVisit,
+        healthStats, setHealthStats,
+        // Web3 Exports
+        isConnected,
+        walletAddress,
+        careFundBalance,
+        recentTransactions,
+        connectWallet,
+        disconnectWallet
+    };
+
+    return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
 }
 
 export function useApp() {
