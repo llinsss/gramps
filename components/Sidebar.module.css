@@ -49,11 +49,18 @@
 
 .profile {
     display: flex;
-    align-items: center;
-    gap: 12px;
+    flex-direction: column;
+    align-items: flex-start;
     padding: 16px;
     border-top: 1px solid var(--glass-border);
     margin-top: auto;
+}
+
+.flexRow {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
 }
 
 .avatar {
