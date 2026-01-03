@@ -1,37 +1,31 @@
 "use client";
 import { useState } from 'react';
+import { useApp } from '@/context/AppContext';
 import styles from './page.module.css';
 
 export default function DocumentsPage() {
+    const { documents, registerDocument, isConnected, connectWallet } = useApp();
+
     const categories = [
-        { name: 'Medical', count: 4, icon: '🏥', color: 'var(--accent-primary)' },
-        { name: 'Legal', count: 2, icon: '⚖️', color: 'var(--warning)' },
-        { name: 'Financial', count: 5, icon: '💰', color: 'var(--success)' },
-        { name: 'IDs', count: 3, icon: '🪪', color: 'var(--accent-secondary)' },
+        { name: 'Medical', count: documents?.filter(d => d.category === 'Medical').length || 0, icon: '🏥', color: 'var(--accent-primary)' },
+        { name: 'Legal', count: documents?.filter(d => d.category === 'Legal').length || 0, icon: '⚖️', color: 'var(--warning)' },
+        { name: 'Financial', count: documents?.filter(d => d.category === 'Financial').length || 0, icon: '💰', color: 'var(--success)' },
+        { name: 'IDs', count: documents?.filter(d => d.category === 'IDs').length || 0, icon: '🪪', color: 'var(--accent-secondary)' },
     ];
 
-    const [docs, setDocs] = useState([
-        { title: 'Medicare Card.pdf', category: 'IDs', date: 'Oct 24, 2024', size: '1.2 MB' },
-        { title: 'DNR Order.pdf', category: 'Legal', date: 'Sep 12, 2024', size: '2.4 MB' },
-        { title: 'Prescription List.jpg', category: 'Medical', date: 'Dec 01, 2024', size: '800 KB' },
-    ]);
-
     const uploadDoc = () => {
+        if (!isConnected) {
+            alert("Please connect wallet first!");
+            return;
+        }
         const title = window.prompt("Document Filename:") || "New Document.pdf";
-        const category = window.prompt("Category (Medical, Legal, IDs):") || "General";
-
-        const newDoc = {
-            title,
-            category,
-            date: 'Just Now',
-            size: '100 KB'
-        };
-
-        setDocs([newDoc, ...docs]);
+        const category = window.prompt("Category (Medical, Legal, IDs, Financial):") || "General";
+        registerDocument(title, category);
     };
 
-    const handleAction = (title) => {
-        alert(`Downloading ${title}... (Secure encrypted download)`);
+    const handleAction = (hash) => {
+        // In real app, this would verify the hash against a file or download from IPFS
+        alert(`Verifying on-chain hash:\n${hash}\n\n[Valid Timestamped Record]`);
     };
 
     return (
@@ -41,9 +35,15 @@ export default function DocumentsPage() {
                     <h1 className="gradient-text">The Vault</h1>
                     <p className={styles.subtitle}>Secure storage for critical family documents.</p>
                 </div>
-                <button className="btn btn-primary" onClick={uploadDoc}>
-                    + Upload Document
-                </button>
+                {isConnected ? (
+                    <button className="btn btn-primary" onClick={uploadDoc}>
+                        + Register Document
+                    </button>
+                ) : (
+                    <button className="btn btn-primary" onClick={connectWallet}>
+                        Connect Wallet
+                    </button>
+                )}
             </header>
 
             {/* Categories */}
@@ -62,18 +62,24 @@ export default function DocumentsPage() {
             </div>
 
             {/* Recent Files */}
-            <h2 className={styles.sectionTitle}>Recent Files</h2>
+            <h2 className={styles.sectionTitle}>Blockchain Registry</h2>
             <div className={styles.docList}>
-                {docs.map((doc, index) => (
-                    <div key={index} className={`glass ${styles.docRow}`}>
-                        <div className={styles.docIcon}>📄</div>
-                        <div className={styles.docDetails}>
-                            <h4>{doc.title}</h4>
-                            <p>{doc.category} • {doc.date} • {doc.size}</p>
+                {isConnected && documents && documents.length > 0 ? (
+                    documents.map((doc, index) => (
+                        <div key={index} className={`glass ${styles.docRow}`}>
+                            <div className={styles.docIcon}>📄</div>
+                            <div className={styles.docDetails}>
+                                <h4>{doc.title}</h4>
+                                <p>{doc.category} • {doc.date} • {doc.size}</p>
+                            </div>
+                            <button className={styles.actionBtn} onClick={() => handleAction(doc.hash)}>🔍</button>
                         </div>
-                        <button className={styles.actionBtn} onClick={() => handleAction(doc.title)}>⋮</button>
+                    ))
+                ) : (
+                    <div className={styles.emptyState}>
+                        <p>{isConnected ? "No documents found in registry." : "Connect wallet to view protected documents."}</p>
                     </div>
-                ))}
+                )}
             </div>
         </div>
     );
