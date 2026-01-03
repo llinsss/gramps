@@ -57,6 +57,7 @@ export function AppProvider({ children }) {
     const [walletAddress, setWalletAddress] = useState('');
     const [careFundBalance, setCareFundBalance] = useState('0.0 ETH');
     const [recentTransactions, setRecentTransactions] = useState([]);
+    const [documents, setDocuments] = useState([]);
 
     // Initial check for wallet connection
     useEffect(() => {
@@ -163,6 +164,25 @@ export function AppProvider({ children }) {
 
             setRecentTransactions(recentWithTime);
 
+            // Fetch Documents
+            const docFilter = contract.filters.DocumentRegistered();
+            const docEvents = await contract.queryFilter(docFilter);
+
+            const docs = await Promise.all(docEvents.map(async (e) => {
+                const block = await provider.getBlock(e.blockNumber);
+                return {
+                    id: e.transactionHash,
+                    hash: e.args[0],
+                    category: e.args[1],
+                    timestamp: e.args[2],
+                    date: new Date(block.timestamp * 1000).toLocaleDateString(),
+                    title: `Doc-${e.args[0].substring(0, 6)}...`, // Placeholder title
+                    size: 'Hash Only'
+                };
+            }));
+
+            setDocuments(docs.reverse()); // Newest first
+
         } catch (error) {
             console.error("Error loading blockchain data:", error);
         }
@@ -191,6 +211,28 @@ export function AppProvider({ children }) {
         }
     };
 
+    const registerDocument = async (fileName, category) => {
+        if (!CONTRACT_ADDRESS || !isConnected) return;
+        try {
+            const provider = new ethers.BrowserProvider(window.ethereum);
+            const signer = await provider.getSigner();
+            const contract = new ethers.Contract(CONTRACT_ADDRESS, GrampsCareABI, signer);
+
+            // Create a hash of the "file" (using name + timestamp for uniqueness in this demo)
+            const docHash = ethers.id(fileName + Date.now());
+
+            const tx = await contract.registerDocument(docHash, category);
+            await tx.wait();
+
+            // Refresh
+            loadBlockchainData(walletAddress);
+            alert("Document Registered on Blockchain!");
+        } catch (error) {
+            console.error("Registration error:", error);
+            alert("Failed to register: " + error.message);
+        }
+    };
+
     const value = {
         tasks, addTask, toggleTask,
         events, addEvent,
@@ -201,9 +243,11 @@ export function AppProvider({ children }) {
         walletAddress,
         careFundBalance,
         recentTransactions,
+        documents,
         connectWallet,
         disconnectWallet,
-        deposit // Exposed function
+        deposit,
+        registerDocument
     };
 
     return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
