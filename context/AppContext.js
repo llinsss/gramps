@@ -1,7 +1,12 @@
 "use client";
-import { createContext, useContext, useState } from 'react';
+import { createContext, useContext, useState, useEffect } from 'react';
+import { ethers } from 'ethers';
+import GrampsCareABI from '@/app/utils/grampsCareABI.json';
 
 const AppContext = createContext();
+
+// TODO: Replace with deployed contract address
+const CONTRACT_ADDRESS = "0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512";
 
 export function AppProvider({ children }) {
     // --- TASKS STATE ---
@@ -47,26 +52,143 @@ export function AppProvider({ children }) {
         deviceOnline: true
     });
 
-    // Web3 State (Mock)
+    // --- WEB3 STATE ---
     const [isConnected, setIsConnected] = useState(false);
     const [walletAddress, setWalletAddress] = useState('');
-    const [careFundBalance, setCareFundBalance] = useState('4.2 ETH'); // Mock balance
-    const [recentTransactions, setRecentTransactions] = useState([
-        { id: 1, type: 'Deposit', from: 'Mark', amount: '0.5 ETH', date: '2h ago' },
-        { id: 2, type: 'Expense', to: 'CVS Pharmacy', amount: '0.05 ETH', date: '1d ago', reason: 'Meds' },
-    ]);
+    const [careFundBalance, setCareFundBalance] = useState('0.0 ETH');
+    const [recentTransactions, setRecentTransactions] = useState([]);
 
-    const connectWallet = () => {
-        // Simulate connection delay
-        setTimeout(() => {
-            setIsConnected(true);
-            setWalletAddress('0x71C...9B21');
-        }, 800);
+    // Initial check for wallet connection
+    useEffect(() => {
+        checkConnection();
+    }, []);
+
+    const checkConnection = async () => {
+        if (typeof window.ethereum !== 'undefined') {
+            try {
+                const accounts = await window.ethereum.request({ method: 'eth_accounts' });
+                if (accounts.length > 0) {
+                    setWalletAddress(accounts[0]);
+                    setIsConnected(true);
+                    loadBlockchainData(accounts[0]);
+                }
+            } catch (error) {
+                console.error("Error checking connection:", error);
+            }
+        }
+    };
+
+    const connectWallet = async () => {
+        if (typeof window.ethereum !== 'undefined') {
+            try {
+                const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+                setWalletAddress(accounts[0]);
+                setIsConnected(true);
+                loadBlockchainData(accounts[0]);
+            } catch (error) {
+                console.error("Connection error:", error);
+            }
+        } else {
+            alert("Please install MetaMask!");
+        }
     };
 
     const disconnectWallet = () => {
         setIsConnected(false);
         setWalletAddress('');
+        setCareFundBalance('0.0 ETH');
+        setRecentTransactions([]);
+    };
+
+    const loadBlockchainData = async (account) => {
+        if (!CONTRACT_ADDRESS) {
+            console.warn("Contract address not set");
+            return;
+        }
+
+        try {
+            const provider = new ethers.BrowserProvider(window.ethereum);
+            const contract = new ethers.Contract(CONTRACT_ADDRESS, GrampsCareABI, provider);
+
+            // Fetch Balance
+            const balance = await provider.getBalance(CONTRACT_ADDRESS);
+            setCareFundBalance(Number(ethers.formatEther(balance)).toFixed(4) + ' ETH');
+
+            // Fetch Events
+            // Note: In production, fetching all logs from block 0 can be slow/limited by RPC.
+            // Optimized query: Look at last 10000 blocks or use an indexer.
+            // For now, we'll try to fetch recent logs. 
+            // Since we don't have block number easily here without another call, we'll query from 'latest' - X or just all if local.
+            // Let's assume a safe range or 'fromBlock: 0' if it's a testnet with few txs.
+
+            const depositFilter = contract.filters.Deposit();
+            const expenseFilter = contract.filters.ExpensePaid();
+
+            const deposits = await contract.queryFilter(depositFilter);
+            const expenses = await contract.queryFilter(expenseFilter);
+
+            // Combine and sort
+            const allEvents = [
+                ...deposits.map(e => ({
+                    id: e.transactionHash + '-dep',
+                    type: 'Deposit',
+                    from: e.args[0], // address from
+                    amount: ethers.formatEther(e.args[1]),
+                    blockNumber: e.blockNumber,
+                    hash: e.transactionHash
+                })),
+                ...expenses.map(e => ({
+                    id: e.transactionHash + '-exp',
+                    type: 'Expense',
+                    to: e.args[1], // recipient
+                    amount: ethers.formatEther(e.args[2]),
+                    reason: e.args[3],
+                    blockNumber: e.blockNumber,
+                    hash: e.transactionHash
+                }))
+            ].sort((a, b) => b.blockNumber - a.blockNumber); // Newest first
+
+            // Format for UI (Limit to 5)
+            // We need timestamps for "2h ago", but that requires getBlock for each event.
+            // For performance, we'll just show 'Block #' or simplified date if possible.
+            // Ideally, we'd fetch block timestamps in parallel.
+
+            // let's fetch timestamps for top 5
+            const recent = allEvents.slice(0, 5);
+            const recentWithTime = await Promise.all(recent.map(async (tx) => {
+                const block = await provider.getBlock(tx.blockNumber);
+                const date = new Date(block.timestamp * 1000).toLocaleDateString();
+                return { ...tx, date };
+            }));
+
+            setRecentTransactions(recentWithTime);
+
+        } catch (error) {
+            console.error("Error loading blockchain data:", error);
+        }
+    };
+
+    const deposit = async (amount) => {
+        if (!CONTRACT_ADDRESS || !isConnected) return;
+        try {
+            const provider = new ethers.BrowserProvider(window.ethereum);
+            const signer = await provider.getSigner();
+
+            // Send ETH directly to contract (triggers receive() function)
+            const tx = await signer.sendTransaction({
+                to: CONTRACT_ADDRESS,
+                value: ethers.parseEther(amount)
+            });
+
+            await tx.wait();
+
+            // Refresh data
+            loadBlockchainData(walletAddress);
+            alert("Deposit successful!");
+        } catch (error) {
+            console.error("Deposit error:", error);
+            alert("Deposit failed: " + error.message);
+        }
     };
 
     const value = {
@@ -80,7 +202,8 @@ export function AppProvider({ children }) {
         careFundBalance,
         recentTransactions,
         connectWallet,
-        disconnectWallet
+        disconnectWallet,
+        deposit // Exposed function
     };
 
     return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
