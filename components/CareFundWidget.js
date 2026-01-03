@@ -3,7 +3,7 @@ import { useApp } from '@/context/AppContext';
 import styles from './CareFundWidget.module.css';
 
 export default function CareFundWidget() {
-    const { isConnected, connectWallet, walletAddress, careFundBalance, recentTransactions } = useApp();
+    const { isConnected, connectWallet, walletAddress, careFundBalance, recentTransactions, deposit } = useApp();
 
     return (
         <div className={`card ${styles.container}`}>
@@ -52,7 +52,13 @@ export default function CareFundWidget() {
                         </div>
                     </div>
 
-                    <button className={`btn glass ${styles.actionBtn}`}>
+                    <button
+                        className={`btn glass ${styles.actionBtn}`}
+                        onClick={() => {
+                            const amt = prompt("Amount to deposit (ETH):", "0.1");
+                            if (amt) deposit(amt);
+                        }}
+                    >
                         + New Deposit
                     </button>
                 </>
