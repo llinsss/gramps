@@ -2,6 +2,8 @@ import './globals.css';
 import Sidebar from '@/components/Sidebar';
 import BottomNav from '@/components/BottomNav';
 import { AppProvider } from '@/context/AppContext';
+import { Toaster } from 'sonner';
+import AIAssistant from '@/components/AIAssistant';
 
 export const metadata = {
   title: 'Gramps - Senior Care Coordinator',
@@ -18,7 +20,9 @@ export default function RootLayout({ children }) {
             <main className="main-content">
               {children}
             </main>
+            <AIAssistant />
             <BottomNav />
+            <Toaster position="top-center" theme="dark" />
           </div>
         </AppProvider>
       </body>
