@@ -4,7 +4,7 @@ import ConnectButton from './ConnectButton';
 
 export default function Sidebar() {
   const menuItems = [
-    { name: 'Dashboard', path: '/', icon: '🏠' },
+    { name: 'Dashboard', path: '/dashboard', icon: '🏠' },
     { name: 'Calendar', path: '/calendar', icon: '📅' },
     { name: 'Care Tasks', path: '/tasks', icon: '✅' },
     { name: 'Health', path: '/health', icon: '❤️' },
