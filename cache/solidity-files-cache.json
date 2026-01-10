@@ -2,12 +2,51 @@
   "_format": "hh-sol-cache-2",
   "files": {
     "/Users/user/Desktop/gramps/contracts/GrampsCare.sol": {
-      "lastModificationDate": 1767342485199,
-      "contentHash": "16b44df3f7643943060a9fa1f95a0d55",
+      "lastModificationDate": 1768044279815,
+      "contentHash": "176bae51e7da6574fb2731aae785e13e",
       "sourceName": "contracts/GrampsCare.sol",
       "solcConfig": {
-        "version": "0.8.19",
+        "version": "0.8.20",
         "settings": {
+          "evmVersion": "paris",
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "@openzeppelin/contracts/utils/ReentrancyGuard.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.20"
+      ],
+      "artifacts": [
+        "GrampsCare"
+      ]
+    },
+    "/Users/user/Desktop/gramps/node_modules/@openzeppelin/contracts/utils/ReentrancyGuard.sol": {
+      "lastModificationDate": 1768044165559,
+      "contentHash": "190613e556d509d9e9a0ea43dc5d891d",
+      "sourceName": "@openzeppelin/contracts/utils/ReentrancyGuard.sol",
+      "solcConfig": {
+        "version": "0.8.20",
+        "settings": {
+          "evmVersion": "paris",
           "optimizer": {
             "enabled": false,
             "runs": 200
@@ -30,10 +69,10 @@
       },
       "imports": [],
       "versionPragmas": [
-        "^0.8.19"
+        "^0.8.20"
       ],
       "artifacts": [
-        "GrampsCare"
+        "ReentrancyGuard"
       ]
     }
   }
