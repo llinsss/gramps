@@ -1,5 +1,7 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.19;
+pragma solidity ^0.8.20;
+
+import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 
 /**
  * @title GrampsCare
@@ -9,94 +11,98 @@ pragma solidity ^0.8.19;
  * 1. Care Fund: Family members deposit ETH. Caregivers withdraw for verified expenses.
  * 2. Document Registry: Store hashes of critical documents (Wills, DNRs) for on-chain 
  *    Proof-of-Existence without exposing private data.
- * 
- * BASE NETWORK OPTIMIZATIONS:
- * - Uses 'calldata' for string inputs to reduce gas.
- * - Relies heavily on Events for data retrieval (cheap on L2) rather than 
- *   expensive storage arrays.
+ * 3. Security: Spending limits and Reentrancy protection.
  */
-contract GrampsCare {
+contract GrampsCare is ReentrancyGuard {
     address public owner;
     
-    // Mapping of authorized caregivers (Address -> IsAuthorized)
+    // --- State Variables ---
     mapping(address => bool) public caregivers;
-
-    // Mapping of document hashes to verify authenticity (DocHash -> Timestamp)
     mapping(bytes32 => uint256) public documentRegistry;
 
-    // Events (Indexed for efficient querying on Base)
+    // Financial Controls
+    uint256 public constant DEFAULT_DAILY_LIMIT = 0.5 ether;
+    mapping(address => uint256) public dailyLimits;
+    mapping(address => mapping(uint256 => uint256)) public dailySpent; // caregiver -> day -> amount
+
+    // --- Events ---
     event Deposit(address indexed from, uint256 amount);
     event ExpensePaid(address indexed caregiver, address indexed recipient, uint256 amount, string reason);
     event CaregiverAdded(address indexed caregiver);
     event CaregiverRemoved(address indexed caregiver);
     event DocumentRegistered(bytes32 indexed docHash, string category, uint256 timestamp);
 
+    // --- Custom Errors (Gas Optimization) ---
+    error NotAuthorized();
+    error NotCaregiver();
+    error InsufficientFunds();
+    error DailyLimitExceeded(uint256 limit, uint256 spent);
+    error TransferFailed();
+    error DocumentAlreadyRegistered();
+
     modifier onlyOwner() {
-        require(msg.sender == owner, "Not authorized");
+        if (msg.sender != owner) revert NotAuthorized();
         _;
     }
 
     modifier onlyCaregiver() {
-        require(caregivers[msg.sender] || msg.sender == owner, "Not a caregiver");
+        if (!caregivers[msg.sender] && msg.sender != owner) revert NotCaregiver();
         _;
     }
 
     constructor() {
         owner = msg.sender;
         emit CaregiverAdded(msg.sender);
+        dailyLimits[msg.sender] = 1000 ether; // Owner has high limit
     }
 
-    /**
-     * @dev Deposit funds into the Care Fund.
-     * Anyone can deposit (other family members).
-     */
     receive() external payable {
         emit Deposit(msg.sender, msg.value);
     }
 
-    /**
-     * @dev Add a family member/caregiver who can authorized expenses.
-     */
     function addCaregiver(address _caregiver) external onlyOwner {
         caregivers[_caregiver] = true;
+        dailyLimits[_caregiver] = DEFAULT_DAILY_LIMIT;
         emit CaregiverAdded(_caregiver);
     }
 
-    /**
-     * @dev Remove a caregiver's access.
-     */
     function removeCaregiver(address _caregiver) external onlyOwner {
         caregivers[_caregiver] = false;
+        dailyLimits[_caregiver] = 0;
         emit CaregiverRemoved(_caregiver);
     }
 
-    /**
-     * @dev Withdraw funds to pay for care-related expenses (Bills, Meds, Home Care).
-     * @param _to The recipient address (e.g., Pharmacy, Utility Company, or Caregiver reimbursement).
-     * @param _amount Amount in wei.
-     * @param _reason Description of the expense (stored in logs to save gas).
-     */
-    function payExpense(address payable _to, uint256 _amount, string calldata _reason) external onlyCaregiver {
-        require(address(this).balance >= _amount, "Insufficient funds");
-        _to.transfer(_amount);
-        emit ExpensePaid(msg.sender, _to, _amount, _reason);
+    function setDailyLimit(address _caregiver, uint256 _limit) external onlyOwner {
+        dailyLimits[_caregiver] = _limit;
     }
 
     /**
-     * @dev Register a document hash in "The Vault".
-     * Provides a permanent timestamped record that a document existed in a specific state.
-     * @param _docHash The keccak256 hash of the document content.
-     * @param _category The category (Legal, Medical, Financial).
+     * @dev Withdraw funds with ReentrancyGuard and Spending Limits.
      */
+    function payExpense(address payable _to, uint256 _amount, string calldata _reason) external onlyCaregiver nonReentrant {
+        if (address(this).balance < _amount) revert InsufficientFunds();
+
+        // Check spending limit (Owner bypasses limit check if needed, but here we enforce consistent rules or give high limit)
+        uint256 currentDay = block.timestamp / 1 days;
+        if (dailySpent[msg.sender][currentDay] + _amount > dailyLimits[msg.sender]) {
+            revert DailyLimitExceeded(dailyLimits[msg.sender], dailySpent[msg.sender][currentDay]);
+        }
+
+        dailySpent[msg.sender][currentDay] += _amount;
+
+        // Safe Transfer using call
+        (bool success, ) = _to.call{value: _amount}("");
+        if (!success) revert TransferFailed();
+
+        emit ExpensePaid(msg.sender, _to, _amount, _reason);
+    }
+
     function registerDocument(bytes32 _docHash, string calldata _category) external onlyCaregiver {
-        require(documentRegistry[_docHash] == 0, "Document already registered");
+        if (documentRegistry[_docHash] != 0) revert DocumentAlreadyRegistered();
         documentRegistry[_docHash] = block.timestamp;
         emit DocumentRegistered(_docHash, _category, block.timestamp);
     }
 
-    /**
-     * @dev Verify if a document is genuine and when it was added.
-     */
     function verifyDocument(bytes32 _docHash) external view returns (bool exists, uint256 timestamp) {
         timestamp = documentRegistry[_docHash];
         exists = timestamp != 0;
