@@ -2,6 +2,7 @@
 import { createContext, useContext, useState, useEffect } from 'react';
 import { ethers } from 'ethers';
 import GrampsCareABI from '@/app/utils/grampsCareABI.json';
+import { toast } from 'sonner';
 
 const AppContext = createContext();
 
@@ -86,11 +87,13 @@ export function AppProvider({ children }) {
                 setWalletAddress(accounts[0]);
                 setIsConnected(true);
                 loadBlockchainData(accounts[0]);
+                toast.success('Wallet connected successfully!');
             } catch (error) {
                 console.error("Connection error:", error);
+                toast.error('Failed to connect wallet');
             }
         } else {
-            alert("Please install MetaMask!");
+            toast.warning("Please install MetaMask!");
         }
     };
 
@@ -99,6 +102,7 @@ export function AppProvider({ children }) {
         setWalletAddress('');
         setCareFundBalance('0.0 ETH');
         setRecentTransactions([]);
+        toast.info('Wallet disconnected');
     };
 
     const loadBlockchainData = async (account) => {
@@ -204,10 +208,10 @@ export function AppProvider({ children }) {
 
             // Refresh data
             loadBlockchainData(walletAddress);
-            alert("Deposit successful!");
+            toast.success('Deposit successful!');
         } catch (error) {
             console.error("Deposit error:", error);
-            alert("Deposit failed: " + error.message);
+            toast.error('Deposit failed: ' + error.message);
         }
     };
 
@@ -226,10 +230,10 @@ export function AppProvider({ children }) {
 
             // Refresh
             loadBlockchainData(walletAddress);
-            alert("Document Registered on Blockchain!");
+            toast.success('Document Registered on Blockchain!');
         } catch (error) {
             console.error("Registration error:", error);
-            alert("Failed to register: " + error.message);
+            toast.error('Failed to register: ' + error.message);
         }
     };
 
