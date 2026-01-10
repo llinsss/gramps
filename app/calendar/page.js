@@ -3,6 +3,9 @@ import { useState } from 'react';
 import { useApp } from '@/context/AppContext';
 import styles from './page.module.css';
 import Modal from '@/components/Modal';
+import { MotionContainer, MotionItem, MotionCard } from '@/components/MotionWrapper';
+import { ChevronLeft, ChevronRight, Clock, Plus, Calendar as CalendarIcon } from 'lucide-react';
+import { toast } from 'sonner';
 
 export default function CalendarPage() {
     const [currentDate, setCurrentDate] = useState(new Date());
@@ -45,26 +48,30 @@ export default function CalendarPage() {
         setIsModalOpen(false);
         setEventTitle('');
         setEventDate('15');
+        toast.success('Event added successfully!');
     };
 
     return (
-        <div className={styles.container}>
+        <MotionContainer className={styles.container}>
             <header className={styles.header}>
-                <div>
+                <MotionItem>
                     <h1 className="gradient-text">Shared Calendar</h1>
                     <p className={styles.subtitle}>Coordinate appointments and family events.</p>
-                </div>
-                <button className="btn btn-primary" onClick={() => setIsModalOpen(true)}>
-                    + Add Event
-                </button>
+                </MotionItem>
+                <MotionItem delay={0.2}>
+                    <button className="btn btn-primary flex-center gap-2" onClick={() => setIsModalOpen(true)}>
+                        <Plus size={20} />
+                        Add Event
+                    </button>
+                </MotionItem>
             </header>
 
             <div className={styles.calendarLayout}>
-                <div className={`glass ${styles.mainCalendar}`}>
+                <MotionCard className={`glass ${styles.mainCalendar}`}>
                     <div className={styles.monthHeader}>
-                        <button className={styles.navBtn}>&lt;</button>
+                        <button className={styles.navBtn}><ChevronLeft size={24} /></button>
                         <h2>October 2024</h2>
-                        <button className={styles.navBtn}>&gt;</button>
+                        <button className={styles.navBtn}><ChevronRight size={24} /></button>
                     </div>
 
                     <div className={styles.weekDays}>
@@ -85,26 +92,32 @@ export default function CalendarPage() {
                             </div>
                         ))}
                     </div>
-                </div>
+                </MotionCard>
 
                 <div className={styles.sidePanel}>
-                    <div className={`card ${styles.upcomingCard}`}>
-                        <h3>Upcoming</h3>
+                    <MotionCard className={`card ${styles.upcomingCard}`} delay={0.3}>
+                        <div className={styles.widgetHeader}>
+                            <h3>Upcoming</h3>
+                            <CalendarIcon size={18} className="text-gray-400" />
+                        </div>
                         <div className={styles.eventList}>
-                            {events.sort((a, b) => a.date - b.date).map(ev => (
-                                <div key={ev.id} className={styles.eventItem}>
+                            {events.sort((a, b) => a.date - b.date).map((ev, i) => (
+                                <MotionItem key={ev.id} index={i} className={styles.eventItem}>
                                     <div className={styles.eventDate}>
                                         <span className={styles.dateNum}>{ev.date}</span>
                                         <span className={styles.dateMon}>OCT</span>
                                     </div>
                                     <div className={styles.eventInfo}>
                                         <h4>{ev.title}</h4>
-                                        <p>{ev.time} • {ev.type}</p>
+                                        <div className="flex items-center gap-2 text-gray-400 text-xs mt-1">
+                                            <Clock size={12} />
+                                            <span>{ev.time} • {ev.type}</span>
+                                        </div>
                                     </div>
-                                </div>
+                                </MotionItem>
                             ))}
                         </div>
-                    </div>
+                    </MotionCard>
                 </div>
             </div>
 
@@ -161,6 +174,6 @@ export default function CalendarPage() {
                     </div>
                 </form>
             </Modal>
-        </div>
+        </MotionContainer>
     );
 }
