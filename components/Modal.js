@@ -1,34 +1,51 @@
 "use client";
 import styles from './Modal.module.css';
-import { useEffect, useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { X } from 'lucide-react';
+import { useEffect } from 'react';
 
 export default function Modal({ isOpen, onClose, title, children }) {
-    const [isVisible, setIsVisible] = useState(false);
 
+    // Prevent scrolling when modal is open
     useEffect(() => {
         if (isOpen) {
-            setIsVisible(true);
             document.body.style.overflow = 'hidden';
         } else {
-            const timer = setTimeout(() => setIsVisible(false), 300); // Wait for animation
             document.body.style.overflow = 'unset';
-            return () => clearTimeout(timer);
         }
     }, [isOpen]);
 
-    if (!isVisible && !isOpen) return null;
-
     return (
-        <div className={`${styles.backdrop} ${isOpen ? styles.open : ''}`} onClick={onClose}>
-            <div className={`${styles.modal} ${isOpen ? styles.modalOpen : ''}`} onClick={e => e.stopPropagation()}>
-                <div className={styles.header}>
-                    <h2>{title}</h2>
-                    <button className={styles.closeBtn} onClick={onClose}>&times;</button>
+        <AnimatePresence>
+            {isOpen && (
+                <div className={styles.overlayContainer} style={{ zIndex: 9999 }}>
+                    <motion.div
+                        className={styles.backdrop}
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        onClick={onClose}
+                    />
+                    <motion.div
+                        className={styles.modal}
+                        initial={{ opacity: 0, scale: 0.95, y: 20 }}
+                        animate={{ opacity: 1, scale: 1, y: 0 }}
+                        exit={{ opacity: 0, scale: 0.95, y: 20 }}
+                        transition={{ type: "spring", duration: 0.5, bounce: 0.3 }}
+                        onClick={e => e.stopPropagation()}
+                    >
+                        <div className={styles.header}>
+                            <h2>{title}</h2>
+                            <button className={styles.closeBtn} onClick={onClose}>
+                                <X size={20} />
+                            </button>
+                        </div>
+                        <div className={styles.content}>
+                            {children}
+                        </div>
+                    </motion.div>
                 </div>
-                <div className={styles.content}>
-                    {children}
-                </div>
-            </div>
-        </div>
+            )}
+        </AnimatePresence>
     );
 }
