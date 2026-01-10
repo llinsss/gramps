@@ -1,15 +1,16 @@
 import Link from 'next/link';
 import styles from './Sidebar.module.css';
-import ConnectButton from './ConnectButton';
+import WalletConnect from './WalletConnect';
+import { Home, Calendar, CheckSquare, Heart, FileText, ClipboardList } from 'lucide-react'; // Using lucide icons for consistency
 
 export default function Sidebar() {
   const menuItems = [
-    { name: 'Dashboard', path: '/dashboard', icon: '🏠' },
-    { name: 'Calendar', path: '/calendar', icon: '📅' },
-    { name: 'Care Tasks', path: '/tasks', icon: '✅' },
-    { name: 'Health', path: '/health', icon: '❤️' },
-    { name: 'Documents', path: '/documents', icon: '📄' },
-    { name: 'Visit Log', path: '/visits', icon: '📝' },
+    { name: 'Dashboard', path: '/dashboard', icon: <Home size={20} /> },
+    { name: 'Calendar', path: '/calendar', icon: <Calendar size={20} /> },
+    { name: 'Care Tasks', path: '/tasks', icon: <CheckSquare size={20} /> },
+    { name: 'Health', path: '/health', icon: <Heart size={20} /> },
+    { name: 'Documents', path: '/documents', icon: <FileText size={20} /> },
+    { name: 'Visit Log', path: '/visits', icon: <ClipboardList size={20} /> },
   ];
 
   return (
@@ -29,7 +30,7 @@ export default function Sidebar() {
 
       <div className={styles.profile}>
         <div style={{ marginBottom: '16px', width: '100%' }}>
-          <ConnectButton />
+          <WalletConnect className="w-full" />
         </div>
         <div className={styles.flexRow}>
           <div className={styles.avatar}>JS</div>
